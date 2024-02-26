@@ -28,12 +28,10 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainContent() {
-    val movies = remember { mutableStateOf(getMovies()) }
-
     Scaffold(
         topBar = { MovieTopAppBar() },
         bottomBar = { MovieBottomNavigationBar() }
-    ) {
-        MovieList(movies = movies.value)
+    ) { innerPadding ->
+        MovieList(movies = getMovies(), padding = innerPadding)
     }
 }
