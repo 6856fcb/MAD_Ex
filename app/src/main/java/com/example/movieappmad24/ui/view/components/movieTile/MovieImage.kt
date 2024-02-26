@@ -1,4 +1,4 @@
-package com.example.movieappmad24.ui.view.components
+package com.example.movieappmad24.ui.view.components.movieTile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.ContentScale
