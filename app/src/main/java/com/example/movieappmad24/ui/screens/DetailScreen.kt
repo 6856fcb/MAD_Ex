@@ -12,6 +12,8 @@ import androidx.compose.material.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -23,6 +25,7 @@ import com.example.movieappmad24.ui.view.components.MovieCard
 
 @Composable
 fun DetailScreen(navController: NavHostController, movie: Movie) {
+        val expanded = remember { mutableStateOf(false) }
         Scaffold(
                 topBar = {
                         SimpleTopMovieAppBar(
@@ -37,7 +40,11 @@ fun DetailScreen(navController: NavHostController, movie: Movie) {
                                 .padding(innerPadding)
                                 .verticalScroll(rememberScrollState())
                 ) {
-                        MovieCard(movie = movie, expanded = false, onExpandToggle = {}, navController)
+                        MovieCard(movie = movie, expanded = expanded.value, onExpandToggle = {
+
+                                expanded.value = !expanded.value
+                        }, navController)
+
                         Spacer(modifier = Modifier.height(16.dp))
                         LazyRow(
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp)

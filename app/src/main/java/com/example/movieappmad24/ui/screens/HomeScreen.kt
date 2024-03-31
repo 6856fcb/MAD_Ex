@@ -31,7 +31,7 @@ fun HomeScreen(navController: NavHostController) {
         Scaffold(
                 topBar = {
                         SimpleTopMovieAppBar(
-                                title = "home", onBackPressed = {})
+                                title = "Home", onBackPressed = {})
                 },
         ) { innerPadding ->
                 MovieList(
