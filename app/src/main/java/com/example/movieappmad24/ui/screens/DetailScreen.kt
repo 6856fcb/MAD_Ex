@@ -46,7 +46,7 @@ fun DetailScreen(navController: NavHostController, movie: Movie) {
                                         Card(
                                                 modifier = Modifier
                                                         .padding(end = 8.dp)
-                                                        .size(120.dp)
+                                                        .size(220.dp)
                                         ) {
                                                 Image(
                                                         painter = rememberImagePainter(
