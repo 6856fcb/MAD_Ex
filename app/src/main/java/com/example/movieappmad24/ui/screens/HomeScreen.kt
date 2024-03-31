@@ -20,7 +20,6 @@ import androidx.navigation.NavHostController
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
 import com.example.movieappmad24.ui.navigation.MovieBottomNavigationBar
-import com.example.movieappmad24.ui.navigation.Screen
 import com.example.movieappmad24.ui.view.components.MovieCard
 import com.example.movieappmad24.ui.view.components.MovieHeader
 import com.example.movieappmad24.ui.view.components.movieTile.MovieDetails
@@ -34,9 +33,6 @@ fun HomeScreen(navController: NavHostController) {
                         SimpleTopMovieAppBar(
                                 title = "home", onBackPressed = {})
                 },
-                bottomBar = {
-                        MovieBottomNavigationBar(navController, currentRoute = "homeScreen")
-                }
         ) { innerPadding ->
                 MovieList(
                         movies = getMovies(),

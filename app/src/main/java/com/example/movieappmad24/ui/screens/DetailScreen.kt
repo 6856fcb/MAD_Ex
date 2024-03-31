@@ -28,8 +28,7 @@ fun DetailScreen(navController: NavHostController, movie: Movie) {
                         SimpleTopMovieAppBar(
                                 title = movie.title,
                                 showBackButton = true,
-                                onBackPressed = { navController.navigateUp()
-                                }
+                                onBackPressed = { navController.navigateUp() }
                         )
                 }
         ) { innerPadding ->
@@ -52,9 +51,7 @@ fun DetailScreen(navController: NavHostController, movie: Movie) {
                                                 Image(
                                                         painter = rememberImagePainter(
                                                                 data = imageUrl,
-                                                                builder = {
-                                                                        crossfade(true)
-                                                                }
+                                                                builder = { crossfade(true) }
                                                         ),
                                                         contentDescription = null,
                                                         modifier = Modifier

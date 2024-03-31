@@ -21,43 +21,44 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
+import com.example.movieappmad24.navigation.Screen
 import com.example.movieappmad24.ui.screens.DetailScreen
 import com.example.movieappmad24.ui.screens.HomeScreen
 //import com.example.movieappmad24.ui.screens.WatchlistScreen
 
-sealed class Screen(val route: String) {
-    object Home : Screen("homeScreen")
-    object Detail : Screen("detailsScreen")
-    object Watchlist : Screen("watchlist")
-}
-
 @Composable
-fun Navigation(navController: NavHostController, navHostController: NavHostController) {
+fun Navigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
         bottomBar = { MovieBottomNavigationBar(navController, currentRoute) },
-    content = { paddingValues ->
-        NavHost(navController = navHostController, startDestination = Screen.Home.route, modifier = Modifier.padding(paddingValues)) {
+    ) { paddingValues ->
+        NavHost(navController = navController, startDestination = Screen.Home.route, modifier = Modifier.padding(paddingValues)) {
             composable(Screen.Home.route) {
                 HomeScreen(navController)
             }
             composable(Screen.Watchlist.route) {
-                val movies = listOf<Movie>()
-                WatchlistScreen(navController, movies)
+                WatchlistScreen(navController, getMovies())
+            }
+            composable(Screen.Detail.route) { backStackEntry ->
+                backStackEntry.arguments?.getString("movieId")?.let { movieId ->
+                    getMovies().find { it.id == movieId }?.let { movie ->
+                        DetailScreen(navController, movie)
+                    }
+                }
             }
         }
-    })
-
+    }
 }
+
 
 @Composable
 fun MovieBottomNavigationBar(navController: NavController, currentRoute: String?) {
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text(text = "home") },
+            label = { Text(text = "Home") },
             selected = currentRoute == Screen.Home.route,
             onClick = {
                 navController.navigate(Screen.Home.route) {
