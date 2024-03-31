@@ -1,37 +1,54 @@
 package com.example.movieappmad24
 
-import android.annotation.SuppressLint
+import WatchlistScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.movieappmad24.models.getMovies
-import com.example.movieappmad24.ui.view.components.MovieBottomNavigationBar
-import com.example.movieappmad24.ui.view.components.MovieList
-import com.example.movieappmad24.ui.view.components.MovieTopAppBar
+import com.example.movieappmad24.ui.screens.HomeScreen
+import com.example.movieappmad24.ui.screens.DetailScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MovieAppMAD24Theme {
-                MainContent()
-            }
+            MovieApp()
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainContent() {
+fun MovieApp() {
+    val navController = rememberNavController()
     Scaffold(
-        topBar = { MovieTopAppBar() },
-        bottomBar = { MovieBottomNavigationBar() }
     ) { innerPadding ->
-        MovieList(movies = getMovies(), padding = innerPadding)
+        NavHost(
+            navController = navController,
+            startDestination = "homeScreen",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("homeScreen") {
+                HomeScreen(navController = navController)
+            }
+            composable("detailsScreen/{movieId}") { backStackEntry ->
+                val movieId = backStackEntry.arguments?.getString("movieId")
+                val movie = getMovies().find { it.id == movieId }
+                if (movie != null) {
+                    DetailScreen(navController = navController, movie = movie)
+                }
+            }
+            composable("watchlist") {
+                WatchlistScreen(navController = navController, movies = getMovies())
+            }
+        }
     }
 }
