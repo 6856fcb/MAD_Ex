@@ -9,6 +9,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -19,15 +20,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
 
 @Composable
-fun MovieCard(movie: Movie, expanded: Boolean, onExpandToggle: () -> Unit, navController: NavHostController) {
+fun MovieCard(
+    movie: Movie,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    isFavorite: Boolean,
+    navController: NavHostController
+) {
     Card(modifier = Modifier.padding(10.dp)) {
         Column {
-            MovieHeader(movie, expanded, onExpandToggle, navController)
+            MovieHeader(
+                movie = movie,
+                expanded = expanded,
+                onExpandToggle = onExpandToggle,
+                onFavoriteClick = { onFavoriteClick(movie.id) },
+                isFavorite = isFavorite,
+                navController = navController
+            )
             AnimatedVisibility(visible = expanded) {
                 Column(modifier = Modifier
                     .fillMaxWidth()
@@ -42,16 +58,24 @@ fun MovieCard(movie: Movie, expanded: Boolean, onExpandToggle: () -> Unit, navCo
 
 
 @Composable
-fun MovieHeader(movie: Movie, expanded: Boolean, onExpandToggle: () -> Unit, navController: NavHostController) {
-    Box(modifier = Modifier.background(color = Color.Blue)) {
-        MovieImage(imageUrl = movie.images.firstOrNull() ?: "", movieId = movie.id, navController = navController)
+fun MovieHeader(
+    movie: Movie,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    isFavorite: Boolean,
+    navController: NavHostController
+) {
+    Box(modifier = Modifier.background(color = Color.White)) {
+        MovieImage(imageUrl = movie.images.firstOrNull() ?: "", navController = navController, movieId = movie.id)
         Icon(
-            imageVector = Icons.Default.FavoriteBorder,
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
             contentDescription = "Add to Watchlist",
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
                 .size(24.dp)
+                .clickable(onClick = onFavoriteClick)
         )
     }
     Row(
@@ -76,17 +100,22 @@ fun MovieImage(imageUrl: String, navController: NavHostController, movieId: Stri
     Image(
         painter = rememberImagePainter(
             data = imageUrl,
-            builder = {
-                crossfade(true)
-            }
+            builder = { crossfade(true) }
         ),
         contentDescription = "Movie Image",
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp)
             .clickable {
-                navController.navigate("detailsScreen/$movieId")
+                navController.navigate("detailsScreen/$movieId") {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
             },
         contentScale = ContentScale.Crop
     )
 }
+

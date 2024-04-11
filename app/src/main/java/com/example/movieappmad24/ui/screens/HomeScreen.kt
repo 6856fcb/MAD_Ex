@@ -15,52 +15,76 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.livedata.observeAsState
 import com.example.movieappmad24.models.Movie
-import com.example.movieappmad24.models.getMovies
-import com.example.movieappmad24.ui.navigation.MovieBottomNavigationBar
 import com.example.movieappmad24.ui.view.components.MovieCard
-import com.example.movieappmad24.ui.view.components.MovieHeader
-import com.example.movieappmad24.ui.view.components.movieTile.MovieDetails
+import com.example.movieappmad24.ui.viewmodel.MoviesViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun HomeScreen(viewModel: MoviesViewModel, navController: NavHostController) {
 
-fun HomeScreen(navController: NavHostController) {
+        val movies by viewModel.movieList.observeAsState(initial = listOf())
+        val favoriteMovieIds by viewModel.favoriteMoviesIds.observeAsState(initial = setOf())
+        val expandedMovieId = remember { mutableStateOf<String?>(null) }
         Scaffold(
                 topBar = {
-                        SimpleTopMovieAppBar(
-                                title = "Home", onBackPressed = {})
+                        SimpleTopMovieAppBar(title = "Home", onBackPressed = {})
                 },
         ) { innerPadding ->
-                MovieList(
-                        movies = getMovies(),
-                        navController = navController,
-                        modifier = Modifier.padding(innerPadding)
-                )
+                LazyColumn(modifier = Modifier.padding(innerPadding)) {
+                        items(movies) { movie ->
+
+                                val isFavorite = movie.id in favoriteMovieIds
+
+                                MovieCard(
+                                        movie = movie,
+                                        expanded = expandedMovieId.value == movie.id,
+                                        onExpandToggle = {
+                                                expandedMovieId.value = if (expandedMovieId.value == movie.id) null else movie.id
+                                                         },
+                                        onFavoriteClick = { movieId ->
+                                                viewModel.toggleFavorite(movieId)
+                                        },
+                                        isFavorite = isFavorite,
+                                        navController = navController
+                                )
+                                Spacer(Modifier.height(8.dp))
+                        }
+                }
         }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
+
 @Composable
-fun MovieList(movies: List<Movie>, navController: NavHostController, modifier: Modifier = Modifier) {
-        // mutableState object?? -> see docs for ref
+fun MovieList(
+        movies: List<Movie>,
+        viewModel: MoviesViewModel,
+        navController: NavHostController,
+        modifier: Modifier = Modifier
+) {
         val expandedMovieId = remember { mutableStateOf<String?>(null) }
+        val favoriteMovieIds by viewModel.favoriteMoviesIds.observeAsState(initial = setOf())
 
         LazyColumn(modifier = modifier.padding(horizontal = 16.dp)) {
                 items(movies) { movie ->
+                        val isFavorite = movie.id in favoriteMovieIds
+
                         MovieCard(
                                 movie = movie,
                                 expanded = expandedMovieId.value == movie.id,
                                 onExpandToggle = {
                                         expandedMovieId.value = if (expandedMovieId.value == movie.id) null else movie.id
                                 },
+                                onFavoriteClick = { movieId -> viewModel.toggleFavorite(movieId) },
+                                isFavorite = isFavorite,
                                 navController = navController
                         )
                         Spacer(Modifier.height(8.dp))
                 }
         }
 }
+
 
 
 
